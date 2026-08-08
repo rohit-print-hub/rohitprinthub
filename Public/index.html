@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rohit Auto Print Hub</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Segoe UI, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #071952, #0B666A);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 95%;
+    max-width: 450px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.3);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo h1 {
+    color: #071952;
+}
+
+.logo p {
+    color: #666;
+}
+
+.upload-box {
+    border: 2px dashed #0B666A;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+input[type=file] {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.option {
+    margin-bottom: 15px;
+}
+
+.option label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.option select,
+.option input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    background: #0B666A;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+button:hover {
+    background: #088395;
+}
+
+.status {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: bold;
+    color: green;
+}
+
+.footer {
+    margin-top: 20px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="logo">
+        <h1>🖨️ Rohit Auto Print Hub</h1>
+        <p>Fast • Easy • Automatic Printing</p>
+    </div>
+
+    <!-- Document Type Dropdown -->
+    <div class="option">
+        <label>Document Type</label>
+        <select id="docType" onchange="checkDocType()">
+            <option value="Normal">📄 Full Page (Normal PDF/Photo)</option>
+            <option value="PAN">💳 PAN / Voter ID (Single Side Card)</option>
+            <option value="[Aadhaar Redacted]">🪪 Card (Front & Back)</option>
+        </select>
+    </div>
+
+    <div class="upload-box">
+        <h3>Select File (Front)</h3>
+        <input type="file" id="fileFront" accept=".pdf,.jpg,.jpeg,.png">
+        
+        <!-- Back side upload option -->
+        <div id="backUploadDiv" style="display: none; margin-top: 15px;">
+            <h3>Select File (Back)</h3>
+            <input type="file" id="fileBack" accept=".jpg,.jpeg,.png">
+        </div>
+    </div>
+
+    <!-- Print Type with onchange trigger -->
+    <div class="option">
+        <label>Print Type</label>
+        <select id="printType" onchange="calculateTotal()">
+            <option value="Black">⚫ Black & White (₹10)</option>
+            <option value="Color">🌈 Color (₹20)</option>
+        </select>
+    </div>
+
+    <div class="option">
+        <label>Paper Size</label>
+        <select id="paperSize">
+            <option value="A4">A4</option>
+            <option value="A3">A3</option>
+        </select>
+    </div>
+
+    <!-- Print Side with onchange trigger -->
+    <div class="option">
+        <label>Print Side</label>
+        <select id="side" onchange="calculateTotal()">
+            <option value="Single">Single Side</option>
+            <option value="Double">Double Side (+₹5)</option>
+        </select>
+    </div>
+
+    <!-- Copies with oninput trigger -->
+    <div class="option">
+        <label>Copies</label>
+        <input type="number" id="copies" value="1" min="1" oninput="calculateTotal()">
+    </div>
+
+    <!-- Live Price Display Box -->
+    <div class="option" style="background: #f0f4f8; padding: 12px; border-radius: 8px; text-align: center;">
+        <h3 style="color: #071952; margin-bottom: 5px;">Total Amount</h3>
+        <span id="totalPrice" style="font-size: 24px; font-weight: bold; color: #0B666A;">₹10</span>
+    </div>
+
+    <button id="printBtn">
+        🖨️ PRINT NOW
+    </button>
+
+    <div class="status" id="status"></div>
+
+    <div class="footer">
+        Powered By Rohit Auto Hub
+    </div>
+
+</div>
+
+<script>
+    // Document type check karke back side show/hide karne ka function
+    function checkDocType() {
+        const docType = document.getElementById("docType").value;
+        const backUploadDiv = document.getElementById("backUploadDiv");
+        
+        if (docType === "[Aadhaar Redacted]") {
+            backUploadDiv.style.display = "block";
+        } else {
+            backUploadDiv.style.display = "none";
+        }
+    }
+
+    // Live Price Calculation Function
+    function calculateTotal() {
+        const printType = document.getElementById("printType").value;
+        const side = document.getElementById("side").value;
+        const copiesVal = document.getElementById("copies").value;
+        const copies = parseInt(copiesVal) || 1;
+
+        // Base Price: Color = 20, Black & White = 10
+        let pricePerCopy = (printType === "Color") ? 20 : 10;
+        
+        // Agar Double Side hai toh ₹5 extra per copy judega
+        if (side === "Double") {
+            pricePerCopy += 5;
+        }
+
+        const totalPrice = pricePerCopy * copies;
+        document.getElementById("totalPrice").innerText = "₹" + totalPrice;
+    }
+
+    const status = document.getElementById("status");
+    const printBtn = document.getElementById("printBtn");
+
+    printBtn.addEventListener("click", async () => {
+
+        const docType = document.getElementById("docType").value;
+        const fileFront = document.getElementById("fileFront").files[0];
+        const fileBack = document.getElementById("fileBack").files[0];
+
+        if (!fileFront) {
+            alert("Please select the front file.");
+            return;
+        }
+
+        if (docType === "[Aadhaar Redacted]" && !fileBack) {
+            alert("Please select the back side file.");
+            return;
+        }
+
+        const printType = document.getElementById("printType").value;
+        const paperSize = document.getElementById("paperSize").value;
+        const side = document.getElementById("side").value;
+        const copies = document.getElementById("copies").value;
+
+        status.innerHTML = "Processing & Uploading...";
+        status.style.color = "blue";
+
+        const formData = new FormData();
+        formData.append("docType", docType);
+        formData.append("fileFront", fileFront);
+        
+        if (fileBack) {
+            formData.append("fileBack", fileBack);
+        }
+
+        formData.append("printType", printType);
+        formData.append("paperSize", paperSize);
+        formData.append("side", side);
+        formData.append("copies", copies);
+
+        // URL se Shop ID extract karna agar maujood ho
+        const urlParams = new URLSearchParams(window.location.search);
+        const shopId = urlParams.get("shop") || "default_shop";
+        formData.append("shopId", shopId);
+
+        try {
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.text();
+            
+            if(response.ok) {
+                status.style.color = "green";
+            } else {
+                status.style.color = "red";
+            }
+            status.innerHTML = result;
+
+        } catch (err) {
+            console.log(err);
+            status.style.color = "red";
+            status.innerHTML = "❌ Upload Failed";
+        }
+    });
+
+    // Page load hote hi ek baar price calculate kar lein
+    window.onload = function() {
+        calculateTotal();
+    };
+</script>
+
+</body>
+</html>
